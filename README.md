@@ -1,7 +1,8 @@
 # Medical
 Asp.net core medical ecommerce site
 
-There are 4 types of admin
+There are 4 types of admin.
+The login credentials are as follow.
 Admin - super admin: admin@gmail.com, admin
 Manager : manager@gmail.com, manager
 Clerk: clerk@gmail.com, clerk
