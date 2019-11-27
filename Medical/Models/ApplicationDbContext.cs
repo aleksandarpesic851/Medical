@@ -13,6 +13,7 @@ namespace Medical.Models
         {
         }
         public virtual DbSet<UserModel> Users { get; set; }
+        public virtual DbSet<CategoryModel> Categories { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {

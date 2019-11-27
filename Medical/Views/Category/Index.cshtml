@@ -1,0 +1,151 @@
+﻿@using Medical.Models
+
+@model IEnumerable<CategoryModel>
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+@{
+    ViewData["Title"] = "Category";
+}
+
+<div class="box">
+    <div class="box-header">
+        <h4 class="box-title">Create Category</h4>
+        <form asp-action="Update" method="post" enctype="multipart/form-data">
+            <div class="row">
+                <div class="col-4">
+                    <label for="category_image">Category Image: </label>
+                    <input type="file" id="category_image" class="form-control" name="image" required accept="image/*" />
+                </div>
+                <div class="col-4 offset-1">
+                    <label for="category_name">Name: </label>
+                    <input id="category_name" class="form-control" name="category_name" placeholder="Category Name" required />
+                </div>
+                <div class="col-2 offset-1 mt-auto">
+                    <button type="submit" class="btn-outline-primary">Create</button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <div class="box-body">
+        <h4 class="box-title">Category List</h4>
+        <table class="table table-bordered table-striped" id="category-table">
+            <thead>
+                <tr>
+                    <th width="40%">Image</th>
+                    <th width="30%">Name</th>
+                    <th style="width: 30%">Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>
+                            <img src="@item.category_image" class="listview-item-image" />
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.category_name)
+                        </td>
+                        <td>
+                            <button type="button" class="btn btn-primary" onclick="showUpdateDlg(@item.category_id, '@item.category_name', '@item.category_image')">Edit</button> &nbsp;&nbsp;
+                            <button type="button" class="btn btn-danger" onclick="Delete(@item.category_id)">Delete</button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="modal fade" tabindex="-1" role="dialog" id="update-modal">
+    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span class="modal-title">Update Category</span>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form asp-action="Update" method="post" enctype="multipart/form-data" style="padding: 20px">
+                    <input id="update_category_id" name="category_id" type="hidden" />
+                    <input id="update_category_image" name="category_image" type="hidden" />
+                    <div class="row">
+                        <div class="col-6  text-center">
+                            <img id="new_category_image" src="" class="category-image" />
+                        </div>
+                        <div class="col-6">
+                            <div class="row" style="margin-bottom: 20px">
+                                <label for="update_category_image">Category Image: </label>
+                                <input type="file" id="update_category_image" name="image" style="width: 100%" accept="image/*" />
+                            </div>
+                            <div class="row" style="margin-bottom: 20px">
+                                <label for="update_category_name">Name: </label>
+                                <input id="update_category_name" name="category_name" placeholder="Category Name" style="width: 100%" required />
+                            </div>
+                            <div class="row">
+                                <button type="submit" style="margin:auto; margin-top: 20px" class="btn-outline-primary">Update</button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- DataTables -->
+@section Links {
+    <link href="https://cdn.datatables.net/1.10.20/css/dataTables.bootstrap4.min.css" />
+}
+@section Scripts {
+    <script src="https://cdn.datatables.net/1.10.20/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.10.20/js/dataTables.bootstrap4.min.js"></script>
+
+    <script>
+        $(function () {
+            $('#category-table').DataTable();
+
+            var errMsg = "@ViewData["errorMsg"]";
+            if (errMsg)
+                alert(errMsg);
+        });
+        function Delete(id){
+            var txt;
+            var r = confirm("Are you sure you want to Delete?");
+            if (r == true) {
+
+                $.ajax(
+                {
+                    type: "POST",
+                    url: '@Url.Action("Delete")',
+                    data: {
+                        id: id
+                    },
+                    error: function (result) {
+                        alert("error");
+                    },
+                    success: function (result) {
+                        if (result == true) {
+                            window.location.reload();
+                        }
+                        else {
+                            alert("There is a problem, Try Later!");
+                        }
+                    }
+                });
+            }
+        }
+
+        function showUpdateDlg(id, name, image) {
+            $("#update_category_id").val(id);
+            $("#update_category_name").val(name);
+            $("#update_category_image").val(image);
+            $("#new_category_image").attr("src", image);
+
+            $("#update-modal").modal();
+        }
+    </script>
+}

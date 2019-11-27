@@ -1,0 +1,61 @@
+﻿<div class="menu-div">
+    <div class="container">
+        <div class="row no-margin">
+            <div class="col-md-2 col-xs-4 vertical-nav bg-light">
+                <ul class="nav flex-column bg-white mb-0">
+                    <li class="nav-item bg-light @(ViewContext.RouteData.Values["Controller"].ToString() == "Home" ? "active" : "")">
+                        <a href="/" class="nav-link text-dark font-italic">
+                            <i class="fa mr-1 text-primary fa-home"></i>
+                            Home
+                        </a>
+                    </li>
+                    <li class="nav-item bg-light @(ViewContext.RouteData.Values["Controller"].ToString() == "About" ? "active" : "")">
+                        <a href="/About" class="nav-link text-dark font-italic">
+                            <i class="fa mr-1 text-primary fa-users"></i>
+                            About Us
+                        </a>
+                    </li>
+                    <li class="nav-item bg-light @(ViewContext.RouteData.Values["Controller"].ToString() == "Medicine" ? "active" : "")">
+                        <a href="/Medicine" class="nav-link text-dark font-italic">
+                            <i class="fa mr-1 text-primary fa-medkit"></i>
+                            Medicines
+                        </a>
+                    </li>
+                    <li class="nav-item bg-light @(ViewContext.RouteData.Values["Controller"].ToString() == "Contact" ? "active" : "")">
+                        <a href="/Contact" class="nav-link text-dark font-italic">
+                            <i class="fa mr-1 text-primary fa-address-card"></i>
+                            Contact Us
+                        </a>
+                    </li>
+                    <li class="nav-item bg-light @(ViewContext.RouteData.Values["Controller"].ToString() == "Category" ? "active" : "")">
+                        <a href="/Category" class="nav-link text-dark font-italic">
+                            <i class="fa mr-1 text-primary fa-list-alt"></i>
+                            Category
+                        </a>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="col-md-10 col-xs-8 slider-area">
+                <!-- Slider -->
+                <div class="block-slider block-slider4">
+                    <ul class="" id="bxslider-home4">
+                        <li>
+                            <img src="img/h4-slide.png" alt="Slide">
+                        </li>
+                        <li>
+                            <img src="img/h4-slide2.png" alt="Slide">
+                        </li>
+                        <li>
+                            <img src="img/h4-slide3.png" alt="Slide">
+                        </li>
+                        <li>
+                            <img src="img/h4-slide4.png" alt="Slide">
+                        </li>
+                    </ul>
+                </div>
+                <!-- ./Slider -->
+            </div> <!-- End slider area -->
+        </div>
+    </div>
+</div>
