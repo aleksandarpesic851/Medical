@@ -53,7 +53,7 @@ namespace Medical
             app.UseStaticFiles();
 
             app.UseCookiePolicy();
-            app.UseAuthorization();
+            app.UseAuthentication();
 
             app.UseMvc(routes =>
             {
