@@ -9,6 +9,7 @@ using Medical.Models;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authentication;
 using Medical.Utility;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Medical.Controllers
 {
@@ -112,6 +113,7 @@ namespace Medical.Controllers
             return Redirect("/Account/Login");
         }
 
+        [Authorize(Roles = Global.ROLE_ADMIN + "," + Global.ROLE_MANAGER)]
         public IActionResult Employee(string message = "")
         {
             List<UserModel> arrEmployees = _dbContext.Users.Where(user => user.user_role == Global.ROLE_CLERK || user.user_role == Global.ROLE_DELIVERY).ToList();
@@ -120,6 +122,7 @@ namespace Medical.Controllers
         }
     
         // Update or Create Clerk and Delivery body
+        [Authorize(Roles = Global.ROLE_ADMIN + "," + Global.ROLE_MANAGER)]
         [HttpPost]
         public async Task<IActionResult> UpdateEmployee(UserModel model)
         {
@@ -163,5 +166,11 @@ namespace Medical.Controllers
             return true;
         }
 
+        [Authorize(Roles = Global.ROLE_CUSTOMER)]
+        public IActionResult ShowAccount()
+        {
+            UserModel currentUser = _dbContext.Users.Find(Convert.ToInt32(User.FindFirstValue("user_id")));
+            return View(currentUser);
+        }
     }
 }

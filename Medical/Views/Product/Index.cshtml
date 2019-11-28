@@ -1,0 +1,46 @@
+﻿@model IEnumerable<IGrouping<int, ProductModel>>
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+@{
+    ViewData["Title"] = "Product";
+    List<CategoryModel> arrCategories = (List<CategoryModel>)ViewData["arrCategories"];
+}
+
+<div class="maincontent-area">
+    <div class="container">
+        @foreach(IGrouping<int, ProductModel> productGroup in Model)
+        {
+            <div class="row box">
+                <div class="col-12">
+                    <div class="latest-product">
+                        <h4>@arrCategories.Find(category => category.category_id == productGroup.Key).category_name</h4>
+                        <div class="product-carousel border-top">
+            
+                            @foreach (ProductModel product in productGroup)
+                            {
+                                <div class="single-product">
+                                    <div class="product-f-image">
+                                        <img src="@product.product_image" class="product-image">
+                                        <div class="product-hover">
+                                            @if (User.IsInRole(Global.ROLE_CUSTOMER))
+                                            {
+                                                <a href="#" class="add-to-cart-link"><i class="fa fa-shopping-cart"></i> Add to cart</a>
+                                            }
+                                            <a href="/Product/Detail?id=@product.product_id" class="view-details-link"><i class="fa fa-link"></i> See details</a>
+                                        </div>
+                                    </div>
+
+                                    <h2><a href="/Product/Detail?id=@product.product_id">@product.product_name</a></h2>
+
+                                    <div class="product-carousel-price">
+                                        <ins>$@product.product_price</ins>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div> <!-- End main content area -->

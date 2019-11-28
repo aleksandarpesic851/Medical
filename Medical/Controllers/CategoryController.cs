@@ -8,9 +8,12 @@ using Microsoft.Extensions.Logging;
 using Medical.Models;
 using System.IO;
 using Medical.Models.ViewModels;
+using Microsoft.AspNetCore.Authorization;
+using Medical.Utility;
 
 namespace Medical.Controllers
 {
+    [Authorize(Roles = Global.ROLE_ADMIN + "," + Global.ROLE_CLERK)]
     public class CategoryController : Controller
     {
         private readonly ApplicationDbContext _dbContext;
@@ -44,7 +47,6 @@ namespace Medical.Controllers
                 }
             }
 
-            //Save party information on db
             CategoryModel newCategory = new CategoryModel()
             {
                 category_id = category.category_id,

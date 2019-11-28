@@ -14,6 +14,10 @@ namespace Medical.Models
         }
         public virtual DbSet<UserModel> Users { get; set; }
         public virtual DbSet<CategoryModel> Categories { get; set; }
+        public virtual DbSet<ProductModel> Products { get; set; }
+        public virtual DbSet<CartModel> Carts { get; set; }
+        public virtual DbSet<OrderModel> Orders { get; set; }
+        public virtual DbSet<PrescriptionModel> Prescriptions { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {

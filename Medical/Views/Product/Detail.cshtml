@@ -1,0 +1,41 @@
+﻿@model ProductModel
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+@{
+    ViewData["Title"] = "Product";
+}
+
+<div class="box">
+    <div class="row">
+        <div class="col-md-4 offset-md-1 mt-auto mb-auto">
+            <img src="@Model.product_image" class="product-image" />
+        </div>
+        <div class="col-md-6">
+            <div class="product-inner">
+                <h2>@Model.product_name</h2>
+                <div class="product-inner-price">
+                    <ins>$@Model.product_price</ins>
+                </div>
+                @if (User.IsInRole(Global.ROLE_CUSTOMER))
+                {
+                    <form action="" class="cart">
+                        <input type="hidden" name="product_id" value="@Model.product_id" />
+                        <div class="quantity">
+                            <input type="number" size="4" class="input-text qty text" title="Qty" value="1" name="product_quantity" min="1" step="1">
+                        </div>
+                        <button class="add_to_cart_button" type="submit">Add to cart</button>
+                    </form>
+                }
+                <div class="product-inner-category">
+                    <p>Category: <a href="#">@ViewData["Category"]</a>
+                </div>
+
+                <div>
+                    <h4>Description</h4>
+                    <p>@Model.product_description</p>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>

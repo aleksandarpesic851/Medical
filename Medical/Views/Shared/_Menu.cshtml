@@ -15,8 +15,8 @@
                             About Us
                         </a>
                     </li>
-                    <li class="nav-item bg-light @(ViewContext.RouteData.Values["Controller"].ToString() == "Medicine" ? "active" : "")">
-                        <a href="/Medicine" class="nav-link text-dark font-italic">
+                    <li class="nav-item bg-light @(ViewContext.RouteData.Values["Controller"].ToString() == "Product" ? "active" : "")">
+                        <a href="/Product" class="nav-link text-dark font-italic">
                             <i class="fa mr-1 text-primary fa-medkit"></i>
                             Medicines
                         </a>
@@ -47,6 +47,19 @@
                                 </a>
                             </li>
                         }
+
+                        @* -----------Customer----------*@
+                        if (User.IsInRole(Global.ROLE_CUSTOMER))
+                        {
+                            <li class="nav-item bg-light @(ViewContext.RouteData.Values["Controller"].ToString() == "Account" ? "active" : "")">
+                                <a href="/Account/ShowAccount" class="nav-link text-dark font-italic">
+                                    <i class="fa mr-1 text-primary fa-user"></i>
+                                    My Account
+                                </a>
+                            </li>
+                        }
+
+                        @* -----------Login & Register----------*@
                         if (!User.Identity.IsAuthenticated)
                         {
                             <li class="nav-item bg-light">
