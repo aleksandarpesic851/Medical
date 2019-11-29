@@ -103,9 +103,9 @@ namespace Medical.Models
                     .HasColumnType("int");
                 entity.Property(e => e.order_date)
                     .HasColumnName("order_date")
-                    .HasColumnType("date");
+                    .HasColumnType("datetime");
                 entity.Property(e => e.order_customer)
-                    .HasColumnName("category_image")
+                    .HasColumnName("order_customer")
                     .HasColumnType("int");
                 entity.Property(e => e.order_address)
                     .HasColumnName("order_address")
@@ -113,11 +113,17 @@ namespace Medical.Models
                 entity.Property(e => e.order_status)
                     .HasColumnName("order_status")
                     .HasMaxLength(255);
+                entity.Property(e => e.order_delivery)
+                    .HasColumnName("order_delivery")
+                    .HasColumnType("int");
+                entity.Property(e => e.order_prescription)
+                    .HasColumnName("order_prescription")
+                    .HasColumnType("int");
             });
 
             builder.Entity<PrescriptionModel>(entity =>
             {
-                entity.ToTable("priscriptions");
+                entity.ToTable("prescriptions");
 
                 entity.Property(e => e.prescription_id)
                     .HasColumnName("prescription_id")
@@ -130,10 +136,13 @@ namespace Medical.Models
                     .HasMaxLength(255);
                 entity.Property(e => e.prescription_date)
                     .HasColumnName("prescription_date")
-                    .HasColumnType("date");
+                    .HasColumnType("datetime");
                 entity.Property(e => e.prescription_order)
                     .HasColumnName("prescription_order")
                     .HasColumnType("int");
+                entity.Property(e => e.prescription_address)
+                    .HasColumnName("prescription_address")
+                    .HasMaxLength(256);
             });
 
             builder.Entity<ProductModel>(entity =>

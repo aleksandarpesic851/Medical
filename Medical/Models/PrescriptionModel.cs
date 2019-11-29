@@ -14,5 +14,6 @@ namespace Medical.Models
         public string prescription_image { get; set; }
         public DateTime prescription_date { get; set; }
         public int prescription_order { get; set; }
+        public string prescription_address { get; set; }
     }
 }

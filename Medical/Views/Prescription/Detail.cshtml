@@ -1,0 +1,166 @@
+﻿@model PrescriptionModel
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+@{
+    ViewData["Title"] = "Product";
+    List<ProductModel> arrProducts = new List<ProductModel>();
+    List<CategoryModel> arrCategories = new List<CategoryModel>();
+    if (Model.prescription_order == 0)
+    {
+        arrProducts = (List<ProductModel>)ViewData["arrProducts"];
+        arrCategories = (List<CategoryModel>)ViewData["arrCategory"];
+    }
+}
+
+<div class="box">
+    <div class="box-header">
+        <h3>Prescription</h3>
+        <div class="row">
+            <div class="ml-auto mr-auto">
+                <img src="@Model.prescription_image" />
+            </div>
+        </div>
+        <br /><br /><br />
+        <div class="row">
+            <div class="col-4">
+                <label><b>Customer : </b> @ViewData["customer"] </label>
+            </div>
+            <div class="col-4">
+                <label><b>Date : </b> @Model.prescription_date </label>
+            </div>
+            <div class="col-4">
+                <label><b>Deliver Address: </b> @Model.prescription_address</label>
+            </div>
+        </div>
+    </div>
+
+    @if (Model.prescription_order == 0)
+    {
+        <div class="box-body">
+            <div class="row">
+                <div class="col-12">
+                    <h3 class="box-title">Product List</h3>
+                    <label>Please insert the numbers of product so that create a new order for this prescription.</label>
+                    <br />
+                    <br />
+                    <table class="table table-bordered table-striped" id="product-table">
+                        <thead>
+                            <tr>
+                                <th>Category</th>
+                                <th>Name</th>
+                                <th>Image</th>
+                                <th>Price ($)</th>
+                                <th>Description</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in arrProducts)
+                            {
+                                <tr onclick="document.location.href='/Product/Detail?id=@item.product_id'" style="cursor: pointer">
+                                    <td>
+                                        @arrCategories.Find(category => category.category_id == item.product_category).category_name
+                                    </td>
+                                    <td>
+                                        @item.product_name
+                                    </td>
+                                    <td>
+                                        <img class="listview-item-image" src="@item.product_image" />
+                                    </td>
+                                    <td>
+                                        @item.product_price
+                                    </td>
+                                    <td>
+                                        @item.product_description
+                                    </td>
+                                    <td>
+                                        <input type="number" data-id="@item.product_id" size="4" class="input-text qty text product_amount" title="Qty" value="0" name="cart_product_count" min="0" step="1">
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <br />
+            <br />
+            <div class="row">
+                <div class="ml-auto mr-auto">
+                    <button class="add_to_cart_button" type="button" onclick="MakeOrder(@Model.prescription_customer, @Model.prescription_id)">Make Order</button>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+@if (Model.prescription_order == 0)
+{
+    <!-- DataTables -->
+    @section Links {
+        <link href="https://cdn.datatables.net/1.10.20/css/dataTables.bootstrap4.min.css" />
+    }
+    @section Scripts {
+        <script src="https://cdn.datatables.net/1.10.20/js/jquery.dataTables.min.js"></script>
+        <script src="https://cdn.datatables.net/1.10.20/js/dataTables.bootstrap4.min.js"></script>
+
+        <script>
+            $(function () {
+                $('#product-table').DataTable();
+                $('.product_amount').each(function () {
+                    $(this).on("click", function (e) {
+                        e.preventDefault();
+                        e.cancelBubble = true;
+                        if (e.stopPropagation) e.stopPropagation();
+                        return false;
+                    })
+                });
+            });
+
+            function MakeOrder(customerId, prescriptionId) {
+                let nCnt = 0;
+                let arrIds = [];
+                let arrVals = [];
+                $('.product_amount').each(function() {
+                    const val = Number($(this).val());
+                    if (val == 0) {
+                        return;
+                    }
+
+                    nCnt++;
+                    arrIds.push($(this).data("id"));
+                    arrVals.push(val);
+                });
+
+                if (nCnt == 0) {
+                    $.bootstrapGrowl("Please insert product count for new order", {
+                        type: 'info',
+                        delay: 2000,
+                    });
+                    return;
+                }
+                const data = {
+                    prescription: prescriptionId,
+                    customer: customerId,
+                    ids: arrIds,
+                    vals: arrVals
+                };
+                $.ajax(
+                {
+                    type: "POST",
+                    url: '/Order/CreateOrder',
+                    data: $.param(data, true),
+                    success: function (response) {
+                        if (response === true) {
+                            document.location.href = "/Prescription";
+                        } else {
+                            $.bootstrapGrowl("Failed", {
+                                type: 'error',
+                                delay: 2000,
+                            });
+                        }
+                    }
+                });
+            }
+        </script>
+    }
+}

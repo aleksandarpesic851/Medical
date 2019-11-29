@@ -66,6 +66,10 @@ namespace Medical.Controllers
             try
             {
                 CategoryModel party = _dbContext.Categories.Find(id);
+                List<ProductModel> arrProducts = _dbContext.Products.Where(product => product.product_category == id).ToList();
+                foreach (ProductModel product in arrProducts)
+                    _dbContext.Products.Remove(product);
+
                 _dbContext.Categories.Remove(party);
                 _dbContext.SaveChanges();
             }

@@ -28,16 +28,27 @@
                         </a>
                     </li>
                     @{
+                        @* -----------Manager----------*@
                         if (User.IsInRole(Global.ROLE_ADMIN) || User.IsInRole(Global.ROLE_MANAGER))
                         {
-                            <li class="nav-item bg-light @(ViewContext.RouteData.Values["Controller"].ToString() == "Category" ? "active" : "")">
+                            <li class="nav-item bg-light @(ViewContext.RouteData.Values["Controller"].ToString() == "Account" &&
+                                ViewContext.RouteData.Values["Action"].ToString() == "Employee" ? "active" : "")">
                                 <a href="/Account/Employee" class="nav-link text-dark font-italic">
                                     <i class="fa mr-1 text-primary fa-users"></i>
                                     Manage Employee
                                 </a>
                             </li>
+                            <li class="nav-item bg-light
+                                @(ViewContext.RouteData.Values["Controller"].ToString() == "Order" &&
+                                ViewContext.RouteData.Values["Action"].ToString() == "Transaction" ? "active" : "")">
+                                <a href="/Order/Transaction" class="nav-link text-dark font-italic">
+                                    <i class="fa mr-1 text-primary fa-exchange-alt"></i>
+                                    Transaction
+                                </a>
+                            </li>
                         }
 
+                        @* -----------Clerk----------*@
                         if (User.IsInRole(Global.ROLE_ADMIN) || User.IsInRole(Global.ROLE_CLERK))
                         {
                             <li class="nav-item bg-light @(ViewContext.RouteData.Values["Controller"].ToString() == "Category" ? "active" : "")">
@@ -46,11 +57,25 @@
                                     Category
                                 </a>
                             </li>
+                            <li class="nav-item bg-light @(ViewContext.RouteData.Values["Controller"].ToString() == "Prescription" ? "active" : "")">
+                                <a href="/Prescription" class="nav-link text-dark font-italic">
+                                    <i class="fa mr-1 text-primary fa-prescription"></i>
+                                    Prescriptions
+                                </a>
+                            </li>
                         }
 
                         @* -----------Customer----------*@
                         if (User.IsInRole(Global.ROLE_CUSTOMER))
                         {
+                            <li class="nav-item bg-light
+                                @(ViewContext.RouteData.Values["Controller"].ToString() == "Order" &&
+                                   ViewContext.RouteData.Values["Action"].ToString() == "Checkout" ? "active" : "")">
+                                <a href="/Order/Checkout" class="nav-link text-dark font-italic">
+                                    <i class="fa mr-1 text-primary fa-shopping-cart"></i>
+                                    Check Out
+                                </a>
+                            </li>
                             <li class="nav-item bg-light @(ViewContext.RouteData.Values["Controller"].ToString() == "Account" ? "active" : "")">
                                 <a href="/Account/ShowAccount" class="nav-link text-dark font-italic">
                                     <i class="fa mr-1 text-primary fa-user"></i>
@@ -77,6 +102,14 @@
                         }
                         else
                         {
+                            <li class="nav-item bg-light
+                                @(ViewContext.RouteData.Values["Controller"].ToString() == "Order" &&
+                                   ViewContext.RouteData.Values["Action"].ToString().Contains("Order") ? "active" : "")">
+                                <a href="/Order/OrderList" class="nav-link text-dark font-italic">
+                                    <i class="fab mr-1 text-primary fa-first-order"></i>
+                                    Orders
+                                </a>
+                            </li>
                             <li class="nav-item bg-light">
                                 <a href="/Account/Logout" class="nav-link text-dark font-italic">
                                     <i class="fa mr-1 text-primary fa-sign-out-alt"></i>

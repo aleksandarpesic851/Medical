@@ -20,8 +20,10 @@ namespace Medical.Controllers
 
         public IActionResult Index()
         {
+            IEnumerable<IGrouping<int, ProductModel>> arrProducts = _dbContext.Products.ToList().GroupBy(product => product.product_category);
+            ViewData["arrCategories"] = _dbContext.Categories.OrderByDescending(e => e.category_id).ToList();
 
-            return View();
+            return View(arrProducts);
         }
     }
 }

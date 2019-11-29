@@ -18,12 +18,12 @@
                 </div>
                 @if (User.IsInRole(Global.ROLE_CUSTOMER))
                 {
-                    <form action="" class="cart">
-                        <input type="hidden" name="product_id" value="@Model.product_id" />
+                    <form action="/Cart/AddToCart" class="cart" id="add-cart-form">
+                        <input type="hidden" name="cart_product" id="cart_product" value="@Model.product_id" />
                         <div class="quantity">
-                            <input type="number" size="4" class="input-text qty text" title="Qty" value="1" name="product_quantity" min="1" step="1">
+                            <input type="number" id="cart_amount" size="4" class="input-text qty text" title="Qty" value="1" name="cart_product_count" min="1" step="1">
                         </div>
-                        <button class="add_to_cart_button" type="submit">Add to cart</button>
+                        <button class="add_to_cart_button" type="button" onclick="addToCart('add-cart-form')">Add to cart</button>
                     </form>
                 }
                 <div class="product-inner-category">

@@ -1,31 +1,59 @@
 jQuery(document).ready(function($){
-    
-    // jQuery sticky Menu
-    
-	//$(".mainmenu-area").sticky({topSpacing:0});
-    
-    
+
+    updateCartInformation();
+
+    //Search Product
+    $('#search-product').keypress(function (e) {
+        if (e.which == 13) {
+            searchProduct();
+        }
+    });
+
     $('.product-carousel').owlCarousel({
-        loop:true,
+        loop:false,
         nav:true,
         margin: 20,
         responsiveClass:true,
-        responsive:{
-            0:{
+        responsive: {
+            200: {
                 items:1,
             },
-            700: {
-                items: 2,
+            400:{
+                items:2,
             },
-            900:{
-                items:3,
+            600: {
+                items: 3,
             },
-            1100:{
+            800:{
                 items:4,
+            },
+            1000:{
+                items:5,
             }
         }
     });  
-    
+
+
+    $('.product-carousel-home').owlCarousel({
+        loop: false,
+        nav: true,
+        margin: 20,
+        responsiveClass: true,
+        responsive: {
+            700: {
+                items: 1,
+            },
+            900: {
+                items: 2,
+            },
+            1100: {
+                items: 3,
+            },
+            1200: {
+                items: 4,
+            }
+        }
+    });  
     
     // Bootstrap Mobile Menu fix
     $(".navbar-nav li a").click(function(){
@@ -57,3 +85,83 @@ jQuery(document).ready(function($){
 
   ga('create', 'UA-10146041-21', 'auto');
   ga('send', 'pageview');
+
+function addToCart(selector) {
+    $.ajax(
+        {
+            type: "POST",
+            url: '/Cart/AddToCart',
+            data: {
+                cart_product: $("#" + selector + " #cart_product").val(),
+                cart_product_count: $("#" + selector + " #cart_amount").val()
+            },
+            success: function (response) {
+                if (response === true) {
+                    $.bootstrapGrowl("Added to cart successfully", {
+                        type: 'info',
+                        delay: 2000,
+                    });
+                    updateCartInformation();
+                } else {
+                    $.bootstrapGrowl("Failed", {
+                        type: 'error',
+                        delay: 2000,
+                    });
+                }
+            }
+        });
+}
+
+function updateCartInformation() {
+    $.ajax(
+        {
+            type: "POST",
+            url: '/Cart/GetInformation',
+            success: function (result) {
+                if (result) {
+                    $("#cart-information").html(result.item + "Item - $" + result.amount);
+                }
+            }
+        });
+}
+
+// search product with name
+function searchProduct() {
+    const key = $("#search-product").val();
+    document.location.href = "/Product?key=" + key;
+}
+
+function ChoosePrescriptionImage() {
+    const isLogin = $("#logged-in").val();
+    if (isLogin) {
+        $("#prescription-modal").modal();
+    } else {
+        document.location.href = "/Account/Login";
+    }
+}
+
+function UploadPrescription() {
+    if (!$("#prescription_deliver_address").val() || !$("#prescription_image").val()) {
+        $.bootstrapGrowl("Please fill all data.", {
+            type: 'info',
+            delay: 2000,
+        });
+    }
+    let formData = new FormData(document.getElementById('prescription-form'));
+    $.ajax({
+        url: '/Prescription/Create',
+        data: formData,
+        processData: false,
+        contentType: false,
+        type: 'POST',
+        success: function (response) {
+            if (response) {
+                $.bootstrapGrowl("Uploaded new prescription successfully.", {
+                    type: 'info',
+                    delay: 2000,
+                });
+                $("#prescription-modal").modal("hide");
+            }
+        }
+    });
+}

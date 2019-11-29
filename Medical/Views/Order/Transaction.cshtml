@@ -1,39 +1,44 @@
-﻿@model IEnumerable<PrescriptionModel>
+﻿@model IEnumerable<OrderModel>
 @addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
 
 @{
-    ViewData["Title"] = "Prescription";
+    ViewData["Title"] = "Transactions";
     List<UserModel> arrUsers = (List<UserModel>)ViewData["arrUsers"];
 }
-
 
 <div class="box">
     <div class="box-body">
         <h4 class="box-title">Orders List</h4>
-        <table class="table table-bordered table-striped" id="prescription-table">
+        <table class="table table-bordered table-striped" id="transaction-table">
             <thead>
                 <tr>
                     <th>Customer</th>
                     <th>Date</th>
-                    <th>Image</th>
-                    <th>Deliver Address</th>
+                    <th>Address</th>
+                    <th>Delivery Body</th>
+                    <th>Status</th>
                 </tr>
             </thead>
             <tbody>
                 @foreach (var item in Model)
                 {
-                    <tr onclick="document.location.href='/Prescription/Detail?id=@item.prescription_id'" style="cursor: pointer">
+                    UserModel delivery = arrUsers.Find(user => user.user_id == item.order_delivery);
+                    <tr onclick="document.location.href='/Order/OrderDetail?id=@item.order_id'" style="cursor: pointer">
                         <td>
-                            @arrUsers.Find(user => user.user_id == item.prescription_customer).user_name
+                            @arrUsers.Find(user => user.user_id == item.order_customer).user_name
                         </td>
                         <td>
-                            @item.prescription_date
+                            @item.order_date
                         </td>
                         <td>
-                            <img class="listview-item-image" src="@item.prescription_image"/>
+                            @item.order_address
                         </td>
                         <td>
-                            @item.prescription_address
+                            @if (delivery != null)
+                                @delivery.user_name
+                        </td>
+                        <td>
+                            @item.order_status
                         </td>
                     </tr>
                 }
@@ -51,7 +56,7 @@
 
     <script>
         $(function () {
-            $('#prescription-table').DataTable();
+            $('#transaction-table').DataTable();
         });
     </script>
 }

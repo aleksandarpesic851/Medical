@@ -11,6 +11,7 @@ using Medical.Models.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Medical.Utility;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using System.Text.RegularExpressions;
 
 namespace Medical.Controllers
 {
@@ -23,19 +24,19 @@ namespace Medical.Controllers
             _dbContext = dbContext;
         }
 
-        public IActionResult Index()
+        public IActionResult Index(string key = "")
         {
             if (User.IsInRole(Global.ROLE_ADMIN) || User.IsInRole(Global.ROLE_CLERK))
-                return RedirectToAction("Admin");
-            IEnumerable<IGrouping<int, ProductModel>> arrProducts = _dbContext.Products.ToList().GroupBy(product => product.product_category);
+                return RedirectToAction("Admin", new { key = key});
+            IEnumerable<IGrouping<int, ProductModel>> arrProducts = _dbContext.Products.Where(product => product.product_name.Contains(key)).ToList().GroupBy(product => product.product_category);
             ViewData["arrCategories"] = _dbContext.Categories.ToList();
             return View(arrProducts);
         }
         
         [Authorize(Roles = Global.ROLE_ADMIN + "," + Global.ROLE_CLERK)]
-        public IActionResult Admin()
+        public IActionResult Admin(string key = "")
         {
-            List<ProductModel> arrProducts = _dbContext.Products.ToList();
+            List<ProductModel> arrProducts = _dbContext.Products.Where(product => product.product_name.Contains(key)).ToList();
             List<SelectListItem> categoryLists = new List<SelectListItem>();
             List<CategoryModel> arrCategories = _dbContext.Categories.ToList();
             foreach (CategoryModel category in arrCategories)
@@ -69,7 +70,7 @@ namespace Medical.Controllers
                 product_image = String.IsNullOrEmpty(filePath) ? product.product_image : filePath,
                 product_name = product.product_name,
                 product_category = product.product_category,
-                product_description =  product.product_description,
+                product_description = Regex.Replace(product.product_description, @"\t|\n|\r", "    "),
                 product_price = product.product_price
             };
 
@@ -101,7 +102,8 @@ namespace Medical.Controllers
         public IActionResult Detail(int id)
         {
             ProductModel product = _dbContext.Products.Find(id);
-            ViewData["Category"] = _dbContext.Categories.Find(product.product_category).category_name;
+            CategoryModel category = _dbContext.Categories.Find(product.product_category);
+            ViewData["Category"] = category == null ? "" : category.category_name;
             return View(product);
         }
     }

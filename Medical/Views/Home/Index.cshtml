@@ -1,8 +1,83 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+﻿@model IEnumerable<IGrouping<int, ProductModel>>
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+@{
+    ViewData["Title"] = "Home";
+    List<CategoryModel> arrCategories = (List<CategoryModel>)ViewData["arrCategories"];
+    int i = 0;
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="maincontent-area">
+    <div class="container">
+        @foreach (IGrouping<int, ProductModel> productGroup in Model)
+        {
+            if (i > 2) break;
+            i++;
+            CategoryModel category = arrCategories.Find(category => category.category_id == productGroup.Key);
+            if (category == null)
+                continue;
+            <div class="row box">
+                <div class="col-12">
+                    <div class="latest-product">
+                        <h4>@category.category_name</h4>
+                        <div class="row">
+                            <div style="width: 300px;">
+                                <div style="margin-top: 40px; border-top: 1px solid #eee; padding-top: 20px">
+                                    <img style="width: 280px; height: 330px; object-fit: contain" src="@category.category_image"/>
+                                </div>
+                            </div>
+                            <div class="col" style="padding: 0px; width: calc(100% - 300px); position: relative">
+                                <div class="product-carousel-home">
+                                    @foreach (ProductModel product in productGroup)
+                                    {
+                                        <div class="single-product">
+                                            <div class="product-f-image">
+                                                <img src="@product.product_image" class="product-image">
+                                                <div class="product-hover">
+                                                    @if (User.IsInRole(Global.ROLE_CUSTOMER))
+                                                    {
+                                                        <a href="javascript:void(0)" onclick="addProductToCart(@product.product_id)" class="add-to-cart-link"><i class="fa fa-shopping-cart"></i> Add to cart</a>
+                                                    }
+                                                    <a href="/Product/Detail?id=@product.product_id" class="view-details-link"><i class="fa fa-link"></i> Details</a>
+                                                </div>
+                                            </div>
+
+                                            <h2><a href="/Product/Detail?id=@product.product_id">@product.product_name</a></h2>
+
+                                            <div class="product-carousel-price">
+                                                <ins>$@product.product_price</ins>
+                                            </div>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    
+        <div class="row">
+            <div class="col-6">
+                <img src="~/img/banner1.png" style="width: 100%; padding: 10px;"/>
+            </div>
+            <div class="col-6">
+                <img src="~/img/banner2.png" style="width: 100%; padding: 10px;"/>
+            </div>
+        </div>
+    </div>
 </div>
+
+<form action="/Cart/AddToCart" class="cart" id="add-cart-form" style="display: none">
+    <input type="hidden" name="cart_product" id="cart_product" value="0" />
+    <input type="hidden" value="1" id="cart_amount" name="cart_product_count">
+</form>
+
+@section Scripts {
+    <script>
+    function addProductToCart(id) {
+        $("#cart_product").val(id);
+        addToCart("add-cart-form");
+    }
+    </script>
+}

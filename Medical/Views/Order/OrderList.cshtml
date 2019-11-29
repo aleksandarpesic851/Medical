@@ -1,0 +1,94 @@
+﻿@model IEnumerable<OrderModel>
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+@{
+    ViewData["Title"] = "Orders";
+    List<UserModel> arrUsers = (List<UserModel>)ViewData["arrUsers"];
+    List<OrderPriceModel> arrPrice = (List<OrderPriceModel>)ViewData["arrPrice"];
+
+}
+
+<div class="box">
+    <div class="box-body">
+        <h4 class="box-title">Orders List</h4>
+        <table class="table table-bordered table-striped" id="order-table">
+            <thead>
+                <tr>
+                    <th>Customer</th>
+                    <th>Date</th>
+                    <th>Address</th>
+                    <th>Delivery Body</th>
+                    <th>Status</th>
+                    <th>Total Price ($)</th>
+                    @if (!User.IsInRole(Global.ROLE_MANAGER))
+                    {
+                        <th>Action</th>
+                    }
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    UserModel delivery = arrUsers.Find(user => user.user_id == item.order_delivery);
+                    float totalPrice = arrPrice.Find(e => e.orderId == item.order_id).totalAmount;
+                    <tr onclick="document.location.href='/Order/OrderDetail?id=@item.order_id'" style="cursor: pointer">
+                        <td>
+                            @arrUsers.Find(user => user.user_id == item.order_customer).user_name
+                        </td>
+                        <td>
+                            @item.order_date
+                        </td>
+                        <td>
+                            @item.order_address
+                        </td>
+                        <td>
+                            @if (delivery != null)
+                                @delivery.user_name
+                        </td>
+                        <td>
+                            @item.order_status
+                        </td>
+                        <td>
+                            @totalPrice
+                        </td>
+                        @if (!User.IsInRole(Global.ROLE_MANAGER))
+                        {
+                            <td>
+                                @*  Show change status button only when the order is assigned to a deliver body  *@
+                                @if ((User.IsInRole(Global.ROLE_DELIVERY) || User.IsInRole(Global.ROLE_CLERK) || User.IsInRole(Global.ROLE_ADMIN)) && item.order_status != Global.ORDER_READY)
+                                {
+                                    <button type="button" class="btn btn-primary" onclick="ShowStatusDlg(@item.order_id, '@item.order_status')">Change Status</button>
+                                }
+                                @*  Clerk can assign order when order is ready  *@
+                                @if ( (User.IsInRole(Global.ROLE_CLERK)  || User.IsInRole(Global.ROLE_ADMIN) ) && item.order_status == Global.ORDER_READY)
+                                {
+                                    <button type="button" class="btn btn-primary" onclick="ShowAssignDlg(@item.order_id)">Assign Order</button>
+                                }
+                                @*  customer can pay when order is in delivering state  *@
+                                @if (User.IsInRole(Global.ROLE_CUSTOMER) && item.order_status == Global.ORDER_DELIVERY_IN_PROGRESS)
+                                {
+                                    <button type="button" class="btn btn-primary" onclick="ShowPaymentDlg(@item.order_id, @totalPrice)">Make Payment</button>
+                                }
+                            </td>
+                        }
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+@await Html.PartialAsync("_OrderForm.cshtml")
+<!-- DataTables -->
+@section Links {
+    <link href="https://cdn.datatables.net/1.10.20/css/dataTables.bootstrap4.min.css" />
+}
+@section Scripts {
+    <script src="https://cdn.datatables.net/1.10.20/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.10.20/js/dataTables.bootstrap4.min.js"></script>
+
+    <script>
+        $(function () {
+            $('#order-table').DataTable();
+        });
+    </script>
+}

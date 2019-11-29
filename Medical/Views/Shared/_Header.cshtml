@@ -11,13 +11,16 @@
             <div class="col-sm-8  mt-auto">
                 <button class="btn btn-light round-border align-right">
                     <i class="fa fa-shopping-cart"></i>
-                    <span class="left-separator"> 0Item - $0 </span>
+                    <span class="left-separator" id="cart-information"> 0 Item - $0 </span>
                 </button>
-                <button class="btn btn-primary round-border align-right">UPLOAD PRESCRIPTION</button>
+                @if(User.IsInRole(Global.ROLE_CUSTOMER))
+                {
+                    <button class="btn btn-primary round-border align-right" onclick="ChoosePrescriptionImage()">Upload Prescription</button>
+                }
                 <div class="input-group align-right" style="width: 200px">
-                    <input type="text" class="form-control" placeholder="Search Medicines">
+                    <input type="text" class="form-control" placeholder="Search Medicines" id="search-product">
                     <div class="input-group-append">
-                        <button class="btn btn-outline-primary" type="button">
+                        <button class="btn btn-outline-primary" type="button" onclick="searchProduct()">
                             <i class="fa fa-search"></i>
                         </button>
                     </div>
@@ -26,3 +29,35 @@
         </div>
     </div>
 </div> <!-- End mainmenu area -->
+
+<input type="hidden" id="logged-in" value="@User.Identity.IsAuthenticated" />
+
+<div class="modal fade" tabindex="-1" role="dialog" id="prescription-modal">
+    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span class="modal-title">Upload Prescription</span>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form action="/Prescription/Create" id="prescription-form" method="post" enctype="multipart/form-data">
+                    <div class="row">
+                        <div class="col-12">
+                            <label for="prescription_deliver_address">Deliver Address</label>
+                            <input id="prescription_deliver_address" name="prescription_deliver_address" class="form-control" required />
+                        </div>
+                        <div class="col-12">
+                            <label for="prescription_image">Image</label>
+                            <input type="file" id="prescription_image" name="prescription_image" required accept="image/*" class="form-control" />
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary" type="button" onclick="UploadPrescription()">Save</button>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,225 @@
+﻿@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+@{
+    List<UserModel> arrUsers = (List<UserModel>)ViewData["arrUsers"];
+    List<SelectListItem> arrDeliveries = new List<SelectListItem>();
+    foreach (UserModel user in arrUsers)
+    {
+        if (user.user_role != Global.ROLE_DELIVERY)
+            continue;
+        arrDeliveries.Add(new SelectListItem(user.user_name, "" + user.user_id));
+    }
+}
+
+@* Update Order Status *@
+<div class="modal fade" tabindex="-1" role="dialog" id="status-modal">
+    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span class="modal-title">Update Order Status</span>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form method="post" style="padding: 20px">
+                    <input id="status_order_id" type="hidden" />
+                    <div class="row">
+                        <div class="col-9">
+                            <label for="status_order_status">Status: </label>
+                            <select id="status_order_status" class="form-control">
+                                <option value="@Global.ORDER_PICKED_UP">@Global.ORDER_PICKED_UP</option>
+                                <option value="@Global.ORDER_DELIVERY_IN_PROGRESS">@Global.ORDER_DELIVERY_IN_PROGRESS</option>
+                                <option value="@Global.ORDER_DELIVERED">@Global.ORDER_DELIVERED</option>
+                                <option value="@Global.ORDER_RETURNED">@Global.ORDER_RETURNED</option>
+                            </select>
+                        </div>
+                        <div class="col-2 offset-1 mt-auto">
+                            <button type="button" onclick="UpdateStatus()" class="btn btn-primary">Update</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@* Assign Order*@
+<div class="modal fade" tabindex="-1" role="dialog" id="assign-modal">
+    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span class="modal-title">Assign Order to Delivery Body</span>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form method="post" style="padding: 20px">
+                    <input id="assign_order_id" name="order_id" type="hidden" />
+                    <div class="row">
+                        <div class="col-9">
+                            <label for="assign_order_delivery">Email: </label>
+                            <select id="assign_order_delivery" name="order_delivery" asp-items="arrDeliveries" class="form-control" required></select>
+                        </div>
+                        <div class="col-2 offset-1 mt-auto">
+                            <button type="button" class="btn btn-primary" onclick="AssignOrder()">Assign</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@* Payment Dialog *@
+<div class="modal fade" tabindex="-1" role="dialog" id="payment-modal">
+    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span class="modal-title">Make Payment</span>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-12">
+                        <label><b>Total Amount : </b><span id="total_pay_amount">$10</span></label>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-4 offset-1">
+                        <input type="radio" name="pay" id="pay_cash" value="Cash" checked/>
+                        <label for="pay_cash" style="cursor: pointer">&nbsp;&nbsp;Cash</label>
+                    </div>
+                    <div class="col-4 offset-1">
+                        <input type="radio" name="pay" id="pay_online" value="Payhere" />
+                        <label for="pay_online" style="cursor: pointer">&nbsp;&nbsp;Payhere</label>
+                    </div>
+                </div>
+                <form id="payhere-form" method="post" action="https://sandbox.payhere.lk/pay/checkout">
+                    <input type="hidden" name="merchant_id" value="1213356">
+                    <input type="hidden" name="return_url" value="http://sample.com/return">
+                    <input type="hidden" name="cancel_url" value="http://sample.com/cancel">
+                    <input type="hidden" name="notify_url" value="http://sample.com/Order/OnlinePay">
+                    <input type="hidden" name="order_id" value="" id="payhere_order_id">
+                    <input type="hidden" name="items" value="">
+                    <input type="hidden" name="currency" value="USD">
+                    <input type="hidden" name="amount" value="" id="payhere_amount">
+                    <input type="hidden" name="first_name" value="" id="payhere_customer_first_name">
+                    <input type="hidden" name="last_name" value="" id="payhere_customer_last_name">
+                    <input type="hidden" name="email" value="" id="payhere_customer_email">
+                    <input type="hidden" name="phone" value="" id="payhere_customer_phone">
+                    <input type="hidden" name="address" value="" id="payhere_customer_address">
+                    <input type="hidden" name="city" value="" id="payhere_customer_city">
+                    <input type="hidden" name="country" value="" id="payhere_customer_country">
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary" onclick="MakePayment()">Pay</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function ShowAssignDlg(id) {
+        var e = window.event;
+        e.preventDefault();
+        e.cancelBubble = true;
+        if (e.stopPropagation) e.stopPropagation();
+        $("#assign_order_id").val(id);
+        $("#assign-modal").modal();
+        return false;
+    }
+
+    function AssignOrder() {
+        $.ajax(
+            {
+                type: "POST",
+                url: '/Order/AssignOrder',
+                data: {
+                    order_id: $("#assign_order_id").val(),
+                    order_delivery: $("#assign_order_delivery").val()
+                },
+                success: function (result) {
+                    if (result == true) {
+                        window.location.reload();
+                    }
+                }
+            });
+    }
+
+    function ShowStatusDlg(id, status) {
+        var e = window.event;
+        e.preventDefault();
+        e.cancelBubble = true;
+        if (e.stopPropagation) e.stopPropagation();
+
+        $("#status_order_id").val(id);
+        $("#status_order_status").val(status);
+        $("#status-modal").modal();
+
+        return false;
+    }
+
+    function UpdateStatus() {
+        $.ajax(
+            {
+                type: "POST",
+                url: '/Order/ChangeStatus',
+                data: {
+                    order_id: $("#status_order_id").val(),
+                    order_status: $("#status_order_status").val()
+                },
+                success: function (result) {
+                    if (result == true) {
+                        window.location.reload();
+                    }
+                }
+            });
+    }
+
+    function ShowPaymentDlg(orderId, total_amount) {
+        var e = window.event;
+        e.preventDefault();
+        e.cancelBubble = true;
+        if (e.stopPropagation) e.stopPropagation();
+
+        $("#total_pay_amount").html(" $" + total_amount);
+        $("#payhere_order_id").val(orderId);
+        $("#payhere_amount").val(total_amount);
+
+        $("#payment-modal").modal();
+        return false;
+    }
+
+    function MakePayment() {
+        const payMethod = $("input[name='pay']:checked").val();
+        if (payMethod == "Cash") {
+            $.ajax(
+                {
+                    type: "POST",
+                    url: '/Order/CashPay',
+                    data: {
+                        orderId: $("#payhere_order_id").val(),
+                    },
+                    success: function (result) {
+                        if (result == true) {
+                            alert("Thank you for your purchase!");
+                            window.location.reload();
+                        } else {
+                            alert("Server is not working properly. Please try again later!");
+                            $("#payment-modal").modal("hide");
+                        }
+                    }
+                });
+        } else {
+            $("#payhere-form").submit();
+        }
+    }
+
+</script>

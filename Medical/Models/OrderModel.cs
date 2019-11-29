@@ -14,5 +14,7 @@ namespace Medical.Models
         public int order_customer { get; set; }
         public string order_address { get; set; }
         public string order_status { get; set; }
+        public int order_delivery { get; set; }
+        public int order_prescription { get; set; }
     }
 }

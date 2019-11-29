@@ -8,14 +8,18 @@
 
 <div class="maincontent-area">
     <div class="container">
-        @foreach(IGrouping<int, ProductModel> productGroup in Model)
+        @foreach (IGrouping<int, ProductModel> productGroup in Model)
         {
+            CategoryModel category = arrCategories.Find(category => category.category_id == productGroup.Key);
+            if (category == null)
+                continue;
+
             <div class="row box">
                 <div class="col-12">
                     <div class="latest-product">
-                        <h4>@arrCategories.Find(category => category.category_id == productGroup.Key).category_name</h4>
-                        <div class="product-carousel border-top">
-            
+                        <h4>@category.category_name</h4>
+                        <div class="product-carousel">
+
                             @foreach (ProductModel product in productGroup)
                             {
                                 <div class="single-product">
@@ -24,9 +28,9 @@
                                         <div class="product-hover">
                                             @if (User.IsInRole(Global.ROLE_CUSTOMER))
                                             {
-                                                <a href="#" class="add-to-cart-link"><i class="fa fa-shopping-cart"></i> Add to cart</a>
+                                                <a href="javascript:void(0)" onclick="addProductToCart(@product.product_id)" class="add-to-cart-link"><i class="fa fa-shopping-cart"></i> Add to cart</a>
                                             }
-                                            <a href="/Product/Detail?id=@product.product_id" class="view-details-link"><i class="fa fa-link"></i> See details</a>
+                                            <a href="/Product/Detail?id=@product.product_id" class="view-details-link"><i class="fa fa-link"></i> Details</a>
                                         </div>
                                     </div>
 
@@ -43,4 +47,18 @@
             </div>
         }
     </div>
-</div> <!-- End main content area -->
+</div>
+
+<form action="/Cart/AddToCart" class="cart" id="add-cart-form" style="display: none">
+    <input type="hidden" name="cart_product" id="cart_product" value="0" />
+    <input type="hidden" value="1" id="cart_amount" name="cart_product_count">
+</form>
+
+@section Scripts {
+<script>
+    function addProductToCart(id) {
+        $("#cart_product").val(id);
+        addToCart("add-cart-form");
+    }
+</script>
+}
