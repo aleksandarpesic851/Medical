@@ -36,8 +36,11 @@ namespace Medical.Controllers
         {
             if (model.prescription_image.Length < 1)
                 return false;
-
-            string filePath = "/uploads/prescription/" + Path.GetRandomFileName() + model.prescription_image.FileName;
+            string fileName = model.prescription_image.FileName;
+            int nIdx = fileName.LastIndexOf('\\');
+            nIdx = nIdx > 0 ? nIdx + 1 : 0;
+            fileName = fileName.Substring(nIdx);
+            string filePath = "/uploads/prescription/" + Path.GetRandomFileName() + fileName;
             string fullPath = Path.GetFullPath("./wwwroot") + filePath;
 
             using (var stream = System.IO.File.Create(fullPath))

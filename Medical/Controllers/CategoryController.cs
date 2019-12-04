@@ -38,7 +38,12 @@ namespace Medical.Controllers
 
             if (category.image != null && category.image.Length > 0)
             {
-                filePath = "/uploads/categories/" + Path.GetRandomFileName() + category.image.FileName;
+                string fileName = category.image.FileName;
+                int nIdx = fileName.LastIndexOf('\\');
+                nIdx = nIdx > 0 ? nIdx + 1 : 0;
+                fileName = fileName.Substring(nIdx);
+
+                filePath = "/uploads/categories/" + Path.GetRandomFileName() + fileName;
                 string fullPath = Path.GetFullPath("./wwwroot") + filePath;
 
                 using (var stream = System.IO.File.Create(fullPath))
