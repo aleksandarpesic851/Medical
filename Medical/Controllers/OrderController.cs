@@ -204,7 +204,7 @@ namespace Medical.Controllers
             return true;
         }
 
-        [Authorize(Roles = Global.ROLE_ADMIN + "," + Global.ROLE_MANAGER)]
+        [Authorize(Roles = Global.ROLE_ADMIN + "," + Global.ROLE_MANAGER + "," + Global.ROLE_CLERK)]
         public bool CreateOrder(PrescriptionOrderViewModel model)
         {
             if (model.ids.Count() == 0)
