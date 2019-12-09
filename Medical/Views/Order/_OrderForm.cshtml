@@ -107,7 +107,7 @@
                     <input type="hidden" name="notify_url" value="http://sample.com/Order/OnlinePay">
                     <input type="hidden" name="order_id" value="" id="payhere_order_id">
                     <input type="hidden" name="items" value="">
-                    <input type="hidden" name="currency" value="USD">
+                    <input type="hidden" name="currency" value="LKR">
                     <input type="hidden" name="amount" value="" id="payhere_amount">
                     <input type="hidden" name="first_name" value="" id="payhere_customer_first_name">
                     <input type="hidden" name="last_name" value="" id="payhere_customer_last_name">
@@ -189,7 +189,7 @@
         e.cancelBubble = true;
         if (e.stopPropagation) e.stopPropagation();
 
-        $("#total_pay_amount").html(" $" + total_amount);
+        $("#total_pay_amount").html(" RS" + total_amount);
         $("#payhere_order_id").val(orderId);
         $("#payhere_amount").val(total_amount);
 

@@ -119,7 +119,10 @@ function updateCartInformation() {
             url: '/Cart/GetInformation',
             success: function (result) {
                 if (result) {
-                    $("#cart-information").html(result.item + "Item - $" + result.amount);
+                    $("#cart-information").html(result.item + "Item - RS" + result.amount);
+                    if ($("#checkout-total-price")) {
+                        $("#checkout-total-price").html(result.amount);
+                    }
                 }
             }
         });

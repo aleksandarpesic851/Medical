@@ -56,6 +56,39 @@ namespace Medical.Controllers
             return View(arrCarts);
         }
 
+        [Authorize(Roles = Global.ROLE_CUSTOMER)]
+        public bool UpdateCart(int cart_id, int cart_amount)
+        {
+            try
+            {
+                CartModel cart = _dbContext.Carts.Find(cart_id);
+                cart.cart_product_count = cart_amount;
+                _dbContext.Carts.Update(cart);
+                _dbContext.SaveChanges();
+            }
+            catch
+            {
+                return false;
+            }
+            return true;
+        }
+
+        [Authorize(Roles = Global.ROLE_CUSTOMER)]
+        public bool DeleteCart(int cart_id)
+        {
+            try
+            {
+                CartModel cart = _dbContext.Carts.Find(cart_id);
+                _dbContext.Carts.Remove(cart);
+                _dbContext.SaveChanges();
+            }
+            catch
+            {
+                return false;
+            }
+            return true;
+        }
+
         [Authorize(Roles = Global.ROLE_ADMIN + "," + Global.ROLE_CLERK)]
         public IActionResult Admin()
         {

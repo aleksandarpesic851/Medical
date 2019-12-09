@@ -13,24 +13,50 @@
                     <thead>
                         <tr>
                             <th>Product</th>
+                            <th>Price (RS)</th>
                             <th>Image</th>
                             <th>Count</th>
+                            <th>Sub Total (RS)</th>
+                            @if (Convert.ToBoolean(ViewData["canMake"]))
+                            {
+                                <th>Action</th>
+                            }
                         </tr>
                     </thead>
                     <tbody>
                         @foreach (CartModel cart in Model)
                         {
-                            <tr>
-                                <td>
-                                    @arrProducts.First(product => product.product_id == cart.cart_product).product_name
-                                </td>
-                                <td>
-                                    <img src="@arrProducts.First(product => product.product_id == cart.cart_product).product_image" class="listview-item-image" />
-                                </td>
-                                <td>
+                            ProductModel product = arrProducts.First(product => product.product_id == cart.cart_product);
+                        <tr id="cart-@cart.cart_id">
+                            <td>
+                                @product.product_name
+                            </td>
+                            <td>
+                                @product.product_price
+                            </td>
+                            <td>
+                                <img src="@product.product_image" class="listview-item-image" />
+                            </td>
+                            <td>
+                                @if (Convert.ToBoolean(ViewData["canMake"]))
+                                {
+                                    <input value="@cart.cart_product_count" data-id="@cart.cart_id" data-price="@product.product_price" min="1" type="number" onchange="updateCart(this)" />
+                                }
+                                else
+                                {
                                     @cart.cart_product_count
+                                }
+                            </td>
+                            <td id="sub-total-@cart.cart_id">
+                                @(cart.cart_product_count * product.product_price)
+                            </td>
+                            @if (Convert.ToBoolean(ViewData["canMake"]))
+                            {
+                                <td>
+                                    <button class="btn btn-danger" type="button" onclick="deleteCart(@cart.cart_id)">Delete</button>
                                 </td>
-                            </tr>
+                            }
+                        </tr>
                         }
                     </tbody>
                 </table>
@@ -39,12 +65,12 @@
 
         <br />
         <div>
-            <label><b>Total Price : </b> &nbsp;$@ViewData["totalPrice"]</label>
+            <label><b>Total Price : </b> &nbsp;RS <label id="checkout-total-price">@ViewData["totalPrice"]</label></label>
         </div>
         @if (Model.Count() > 0 && Convert.ToBoolean(ViewData["canMake"]))
         {
             <br />
-            <form action="/Order/Make">
+            <form action="/Order/Make" id="form-make-order">
                 <div class="row">
                     <div class="col-8 offset-1">
                         <label for="order_address">Delivery Address</label>
@@ -72,10 +98,66 @@
         });
 
         function Order() {
+            const totalPrice = Number($("#checkout-total-price").html());
+            if (totalPrice < 1) {
+                alert("There is no product to order. please add products to cart");
+                return;
+            }
+
             var r = confirm("Are you sure you want to order these products?");
             if (r == true) {
                 $("#order-form").submit();
             }
+        }
+
+        function updateCart(item) {
+            const id = $(item).data("id");
+            const amount = $(item).val();
+            const price = $(item).data("price");
+
+            if (amount < 1) {
+                return;
+            }
+
+            $.ajax({
+                url: '/Order/UpdateCart',
+                data: {
+                    cart_id: id,
+                    cart_amount: amount
+                },
+                type: 'POST',
+                success: function (response) {
+                    if (response) {
+                        updateCartInformation();
+                        $("#sub-total-" + id).html(price * amount);
+                    }
+                }
+            });
+        }
+
+        function deleteCart(cart_id) {
+            var r = confirm("Are you sure you want to Delete?");
+            if (r != true) {
+                return;
+            }
+
+            $.ajax({
+                url: '/Order/DeleteCart',
+                data: {
+                    cart_id: cart_id,
+                },
+                type: 'POST',
+                success: function (response) {
+                    if (response) {
+                        updateCartInformation();
+                        const totalPrice = Number($("#checkout-total-price").html());
+                        if (totalPrice < 1 && $("#form-make-order")) {
+                            $("#form-make-order").hide();
+                        }
+                        $("#cart-" + cart_id).hide();
+                    }
+                }
+            });
         }
     </script>
 }
